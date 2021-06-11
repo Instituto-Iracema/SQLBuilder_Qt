@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include<QDebug>
 
-#include <SqlBuilder.h>
+#include <sql_builder.h>
 
 int main(int argc, char *argv[])
 {
