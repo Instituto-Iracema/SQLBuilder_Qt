@@ -1,14 +1,14 @@
-#ifndef SQLBUILDER_H
-#define SQLBUILDER_H
+#ifndef SQL_BUILDER_H
+#define SQL_BUILDER_H
 
 #include <QString>
 #include <QStringList>
 #include <QVariantMap>
 #include <QSqlError>
-#include <QDebug>
 
-#include "Database.h"
+#include "database_connection.h"
 
+namespace SQLBuilder{
 class SqlBuilder
 {
 protected:
@@ -47,7 +47,7 @@ public:
         Map,
     };
 };
+}
 
-SqlBuilder* queryBuilder(QString table);
 
-#endif // SQLBUILDER_H
+#endif // SQL_BUILDER_H

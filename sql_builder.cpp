@@ -1,6 +1,7 @@
-#include "SqlBuilder.h"
-#include <QSqlError>
+#include "sql_builder.h"
 #include <QDebug>
+
+using SqlBuilder = SQLBuilder::SqlBuilder;
 
 SqlBuilder::SqlBuilder(QString table)
 {
@@ -120,9 +121,8 @@ SqlBuilder* SqlBuilder::executed(int outputMode) {
  * @brief SqlBuilder::execute
  */
 bool SqlBuilder::execute(int outputMode) {
-    Database* db = Database::getInstance();
-    const bool executed = db->execute(this->sql, this->params);
-    const QSqlError queryLastError = db->query->lastError();
+    const bool executed = DatabaseConnection::getInstance()->execute(this->sql, this->params);
+    const QSqlError queryLastError = DatabaseConnection::getInstance()->query->lastError();
 
     if (
             (outputMode == DebugMode::DebugAll) ||
@@ -142,9 +142,8 @@ bool SqlBuilder::execute(int outputMode) {
  * @return
  */
 QVariant SqlBuilder::rows(int outputMode, int debugMode) {
-    Database* db = Database::getInstance();
     this->execute(debugMode);
-    QSqlQuery *query = db->query;
+    QSqlQuery *query = DatabaseConnection::getInstance()->query;
 
     const int columnsCount = this->columns.size();
     int rowIndex, columnIndex;
@@ -208,13 +207,4 @@ QString SqlBuilder::getSql() { return this->sql; }
  */
 void SqlBuilder::cleanSql() {
    this->sql = "";
-}
-
-/**
- * @brief db
- * @param table
- * @return
- */
-SqlBuilder* queryBuilder(QString table) {
-  return new SqlBuilder(table);
 }
