@@ -171,6 +171,8 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
       }
     }
 
+    DatabaseConnection::getInstance()->closeConnection();
+
     if (outputMode == RowOutput::Grid || outputMode == RowOutput::SingleList)
         return QVariant(resultRows);
     else if (outputMode == RowOutput::Map)

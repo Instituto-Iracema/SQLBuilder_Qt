@@ -5,9 +5,6 @@
 #include <QSqlQuery>
 #include <QVariantMap>
 
-#define DATABASE_TYPE "QSQLITE"
-#define DATABASE_PATH "/tmp/slq_builder.db"
-
 namespace SQLBuilder{
 class DatabaseConnection
 {
@@ -15,15 +12,27 @@ public:
     static DatabaseConnection* getInstance();
     QSqlDatabase connection;
     QSqlQuery *query;
+    void openConnection();
     void closeConnection();
     bool execute(QString sql, QVariantMap params = {});
+
+    static QString getDatabasePath();
+    static void setDatabasePath(const QString &value);
+    static QString getDatabaseType();
+    static void setDatabaseType(const QString &value);
 
 private:
     DatabaseConnection();
     ~DatabaseConnection();
 
+    static QString database_path;
+    static QString database_type;
+
     QSqlQuery* createQuery();
     QSqlDatabase createConnection();
+
+    bool openDatabase();
+
 protected:
     static DatabaseConnection* instance;
 };

@@ -5,33 +5,48 @@ using DatabaseConnection = SQLBuilder::DatabaseConnection;
 
 DatabaseConnection* DatabaseConnection::instance = nullptr;
 
-DatabaseConnection::DatabaseConnection()
-{
-  this->connection = this->createConnection();
-  this->query = this->createQuery();
-}
+QString DatabaseConnection::database_type = "QSQLITE";
+QString DatabaseConnection::database_path = "/tmp/slq_builder.db";
+
+DatabaseConnection::DatabaseConnection(){}
 
 DatabaseConnection::~DatabaseConnection()
 {
   this->closeConnection();
 }
 
-bool DatabaseConnection::execute(QString sql, QVariantMap params) {
-  QSqlQuery *query = this->query;
-  query->prepare(sql);
-  foreach(auto param, params.keys()) {
-   query->bindValue(":" + param, params[param]);
-  }
-  return query->exec();
+/**
+ * @brief DatabaseConnection::execute
+ * @param sql
+ * @param params
+ * @return
+ */
+bool DatabaseConnection::execute(QString sql, QVariantMap params)
+{
+    openDatabase();
+    QSqlQuery *query = this->query;
+    query->prepare(sql);
+    foreach(auto param, params.keys()) {
+    query->bindValue(":" + param, params[param]);
+    }
+    return query->exec();
 }
 
+/**
+ * @brief Clear the querry attribute value and close database connection
+ */
 void DatabaseConnection::closeConnection()
 {
     this->query->clear();
     this->connection.close();
 }
 
-DatabaseConnection* DatabaseConnection::getInstance() {
+/**
+ * @brief DatabaseConnection::getInstance
+ * @return
+ */
+DatabaseConnection* DatabaseConnection::getInstance()
+{
     if (DatabaseConnection::instance == 0)
     {
         DatabaseConnection::instance = new DatabaseConnection();
@@ -39,35 +54,89 @@ DatabaseConnection* DatabaseConnection::getInstance() {
     return DatabaseConnection::instance;
 }
 
-/*
- * @brief Database::createQuery
- * @return
+/**
+ * @brief DatabaseConnection::openConnection
+ */
+void DatabaseConnection::openConnection()
+{
+    this->connection = this->createConnection();
+    this->query = this->createQuery();
+}
+
+/**
+ * @brief Create a pointer to a QSqlQuery created from current connection
+ * @return The QSqlQuery pointer
  */
 QSqlQuery* DatabaseConnection::createQuery() {
 	return new QSqlQuery(this->connection);
 }
 
 /**
- * Returns an instance of database connection.
- * @brief Database::createConnection
- * @return
+ * @brief Configure the connection attribute
+ * @return the db instance
  */
 QSqlDatabase DatabaseConnection::createConnection() {
     /**
-     * Instanciate database connection object
+     * @brief Instanciate database connection object
      * using SQLITE driver.
-     * @brief db
      */
-    QSqlDatabase db = QSqlDatabase::addDatabase(DATABASE_TYPE);
-    db.setDatabaseName(DATABASE_PATH);
+    connection = QSqlDatabase::addDatabase(database_type);
+    connection.setDatabaseName(database_path);
 
-    if (!db.open()) {
+    openDatabase();
+    connection.close();
+
+    return connection;
+}
+
+/**
+ * @brief Try open the database file
+ * @return True if database was opened and throw exception if a error occur
+ */
+bool DatabaseConnection::openDatabase()
+{
+    if (!connection.open()) {
       /**
        * Throws an exception if had some error on connection attempt.
        * @throws exception
        */
-       throw std::runtime_error(QString("Error trying connect to database %1.").arg(DATABASE_PATH).toUtf8());
+       throw std::runtime_error(QString("Error trying connect to database %1.").arg(database_path).toUtf8());
     }
+    return  true;
+}
 
-    return db;
+/**
+ * @brief Get database type attribute value
+ * @return The database type attribute value
+ */
+QString DatabaseConnection::getDatabaseType()
+{
+    return database_type;
+}
+
+/**
+ * @brief DatabaseConnection::setDatabaseType
+ * @param value
+ */
+void DatabaseConnection::setDatabaseType(const QString &value)
+{
+    database_type = value;
+}
+
+/**
+ * @brief Get database path attribute value
+ * @return The database path attribute value
+ */
+QString DatabaseConnection::getDatabasePath()
+{
+    return database_path;
+}
+
+/**
+ * @brief DatabaseConnection::setDatabasePath
+ * @param value
+ */
+void DatabaseConnection::setDatabasePath(const QString &value)
+{
+    database_path = value;
 }
