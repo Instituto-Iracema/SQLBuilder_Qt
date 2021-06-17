@@ -26,7 +26,7 @@ public:
     SqlBuilder* tableInfo();
     SqlBuilder* executed(int outputMode=DebugMode::DebugErrors);
 
-    bool execute(int debugMode=DebugMode::DebugErrors);
+    bool execute(int debugMode=DebugMode::DebugErrors,int* lastInsertId = nullptr);
     QVariant rows(int outputMode=RowOutput::Grid, int debugMode=DebugMode::DebugErrors);
 
     QStringList tableColumns();

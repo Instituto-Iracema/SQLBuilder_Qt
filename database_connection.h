@@ -14,7 +14,7 @@ public:
     QSqlQuery *query;
     void openConnection();
     void closeConnection();
-    bool execute(QString sql, QVariantMap params = {});
+    bool execute(QString sql, QVariantMap params = {},int* lastInsertId = nullptr);
 
     static QString getDatabasePath();
     static void setDatabasePath(const QString &value);

@@ -112,6 +112,11 @@ SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue) {
     return this;
 }
 
+/**
+ * @brief SqlBuilder::executed
+ * @param outputMode
+ * @return
+ */
 SqlBuilder* SqlBuilder::executed(int outputMode) {
     this->execute(outputMode);
     return this;
@@ -120,8 +125,8 @@ SqlBuilder* SqlBuilder::executed(int outputMode) {
 /**
  * @brief SqlBuilder::execute
  */
-bool SqlBuilder::execute(int outputMode) {
-    const bool executed = DatabaseConnection::getInstance()->execute(this->sql, this->params);
+bool SqlBuilder::execute(int outputMode,int* lastInsertId) {
+    const bool executed = DatabaseConnection::getInstance()->execute(this->sql, this->params,lastInsertId);
     const QSqlError queryLastError = DatabaseConnection::getInstance()->query->lastError();
 
     if (
@@ -181,12 +186,20 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
         return QVariant();
 }
 
+/**
+ * @brief SqlBuilder::tableColumns
+ * @return
+ */
 QStringList SqlBuilder::tableColumns() {
     return this->tableInfo()
             ->select({"name"})
             ->rows(RowOutput::SingleList).toStringList();
 }
 
+/**
+ * @brief SqlBuilder::tableInfo
+ * @return
+ */
 SqlBuilder* SqlBuilder::tableInfo() {
     const QString tableName = QString("PRAGMA_TABLE_INFO('%1')").arg(this->table);
     return new SqlBuilder(tableName);

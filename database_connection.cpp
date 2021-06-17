@@ -21,15 +21,21 @@ DatabaseConnection::~DatabaseConnection()
  * @param params
  * @return
  */
-bool DatabaseConnection::execute(QString sql, QVariantMap params)
+bool DatabaseConnection::execute(QString sql, QVariantMap params,int* lastInsertId)
 {
     openDatabase();
     QSqlQuery *query = this->query;
     query->prepare(sql);
     foreach(auto param, params.keys()) {
-    query->bindValue(":" + param, params[param]);
+        query->bindValue(":" + param, params[param]);
     }
-    return query->exec();
+
+    bool result = query->exec();
+
+    if(lastInsertId!=nullptr)
+        *lastInsertId = query->lastInsertId().toInt();
+
+    return result;
 }
 
 /**
