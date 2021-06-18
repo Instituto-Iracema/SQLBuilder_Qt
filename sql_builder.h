@@ -27,7 +27,7 @@ public:
     SqlBuilder* executed(int outputMode=DebugMode::DebugErrors);
 
     bool execute(int debugMode=DebugMode::DebugErrors,int* lastInsertId = nullptr);
-    QVariant rows(int outputMode=RowOutput::Grid, int debugMode=DebugMode::DebugErrors);
+    QVariant rows(int outputMode=RowOutput::Map, int debugMode=DebugMode::DebugErrors);
 
     QStringList tableColumns();
 

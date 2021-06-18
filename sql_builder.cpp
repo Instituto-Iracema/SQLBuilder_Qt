@@ -153,8 +153,8 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
     const int columnsCount = this->columns.size();
     int rowIndex, columnIndex;
     QVariant value;
-    QVariantList resultRows, row;
-    QVariantMap resultMap;
+    QVariantList resultRows, row,resultMap;
+    QVariantMap rowMap;
     QString column;
 
     // Iterate all rows on result
@@ -163,7 +163,7 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
           column = this->columns[columnIndex];
           value = query->value(columnIndex);
           if (outputMode == RowOutput::Map) {
-              /* Not implemented yet */
+              rowMap.insert(column,value);
           } else if (outputMode == RowOutput::SingleList) {
               resultRows.append(value);
           } else if (outputMode == RowOutput::Grid) {
@@ -173,6 +173,9 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
       if (outputMode == RowOutput::Grid) {
           resultRows.append(QVariant(row));
           row = {};
+      } else if(outputMode == RowOutput::Map) {
+          resultMap.append(rowMap);
+          rowMap = {};
       }
     }
 
