@@ -30,6 +30,7 @@ public:
     QVariant rows(int outputMode=RowOutput::Map, int debugMode=DebugMode::DebugErrors);
 
     QStringList tableColumns();
+    QString getTableName();
 
     void setSql(QString sql);
     QString getSql();

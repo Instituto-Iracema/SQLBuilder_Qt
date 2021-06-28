@@ -54,9 +54,9 @@ SqlBuilder* SqlBuilder::where(QString column, QString sqlOperator, QVariantList 
 }
 
 /**
- * @brief SqlBuilder::insert
- * @param values
- * @return
+ * @brief insert on current sql the core of a delete sql query
+ * @param mapColumnToValue
+ * @return This
  */
 SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue) {
     this->sql += "INSERT INTO " + this->table;
@@ -82,9 +82,8 @@ SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue) {
 }
 
 /**
-    this->sql = "";
- * @brief SqlBuilder::destroy
- * @return
+ * @brief insert on current sql the core of a delete sql query
+ * @return This
  */
 SqlBuilder* SqlBuilder::destroy() {
     this->sql += "DELETE FROM " + this->table;
@@ -113,9 +112,9 @@ SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue) {
 }
 
 /**
- * @brief SqlBuilder::executed
- * @param outputMode
- * @return
+ * @brief call the execute function
+ * @param outputMode The format to output
+ * @return This
  */
 SqlBuilder* SqlBuilder::executed(int outputMode) {
     this->execute(outputMode);
@@ -123,7 +122,10 @@ SqlBuilder* SqlBuilder::executed(int outputMode) {
 }
 
 /**
- * @brief SqlBuilder::execute
+ * @brief Execute the current sql query
+ * @param outputMode The format to output
+ * @param lastInsertId A pointer to last inserted row id on database
+ * @return True if the query was executed and false if it fail
  */
 bool SqlBuilder::execute(int outputMode,int* lastInsertId) {
     const bool executed = DatabaseConnection::getInstance()->execute(this->sql, this->params,lastInsertId);
@@ -143,8 +145,10 @@ bool SqlBuilder::execute(int outputMode,int* lastInsertId) {
 }
 
 /**
- * @brief SqlBuilder::rows
- * @return
+ * * @brief Execute the current sql query and format the output
+ * @param outputMode The format to output
+ * @param debugMode Define what will be printed on application output
+ * @return formated response of the query
  */
 QVariant SqlBuilder::rows(int outputMode, int debugMode) {
     this->execute(debugMode);
@@ -209,20 +213,26 @@ SqlBuilder* SqlBuilder::tableInfo() {
 }
 
 /**
- * @brief SqlBuilder::setSql
- * @param sql
+ * @brief set a new value to sql query
+ * @param The new sql query
  */
 void SqlBuilder::setSql(QString sql) { this->sql = sql; }
 
 /**
- * @brief SqlBuilder::getSql
- * @return
+ * @brief get the current sql quary
+ * @return The sql query
  */
 QString SqlBuilder::getSql() { return this->sql; }
 
 /**
- * @brief SqlBuilder::cleanSql
+ * @brief define the sql query to empty string
  */
 void SqlBuilder::cleanSql() {
    this->sql = "";
 }
+
+/**
+ * @brief return table name
+ * @return The table name
+ */
+QString SQLBuilder::SqlBuilder::getTableName(){ return this->table; }
