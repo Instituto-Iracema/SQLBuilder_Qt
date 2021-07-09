@@ -116,9 +116,26 @@ SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue) {
  * @param outputMode The format to output
  * @return This
  */
-SqlBuilder* SqlBuilder::executed(int outputMode) {
-    this->execute(outputMode);
-    return this;
+bool SqlBuilder::executed(int outputMode) {
+    DatabaseConnection::getInstance()->openConnetion();
+    QSqlQuery query = DatabaseConnection::getInstance()->createQuery();
+    query.prepare(sql);
+    foreach(auto param, params.keys()) {
+        query.bindValue(":" + param, params[param]);
+    }
+
+    bool result = query.exec();
+
+    const QSqlError queryLastError = query.lastError();
+
+    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid())) {
+        qDebug() << "SqlError:" << queryLastError.text();
+        qDebug() << "Sql statement:" << this->sql;
+        qDebug() << "Params:" << this->params;
+    }
+
+    cleanSql();
+    return result;
 }
 
 /**
@@ -127,32 +144,39 @@ SqlBuilder* SqlBuilder::executed(int outputMode) {
  * @param lastInsertId A pointer to last inserted row id on database
  * @return True if the query was executed and false if it fail
  */
-bool SqlBuilder::execute(int outputMode,int* lastInsertId) {
-    const bool executed = DatabaseConnection::getInstance()->execute(this->sql, this->params,lastInsertId);
-    const QSqlError queryLastError = DatabaseConnection::getInstance()->query->lastError();
+QSqlQuery SqlBuilder::execute(int outputMode,int* lastInsertId) {
+    DatabaseConnection::getInstance()->openConnetion();
+    QSqlQuery query = DatabaseConnection::getInstance()->createQuery();
+    query.prepare(sql);
+    foreach(auto param, params.keys()) {
+        query.bindValue(":" + param, params[param]);
+    }
 
-    if (
-            (outputMode == DebugMode::DebugAll) ||
-            (outputMode == DebugMode::DebugErrors && queryLastError.isValid())
-            ) {
+    query.exec();
+
+    if(lastInsertId!=nullptr)
+        *lastInsertId = query.lastInsertId().toInt();
+
+    const QSqlError queryLastError = query.lastError();
+
+    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid())) {
         qDebug() << "SqlError:" << queryLastError.text();
         qDebug() << "Sql statement:" << this->sql;
         qDebug() << "Params:" << this->params;
     }
 
     cleanSql();
-    return executed;
+    return query;
 }
 
 /**
- * * @brief Execute the current sql query and format the output
+ * @brief Execute the current sql query and format the output
  * @param outputMode The format to output
  * @param debugMode Define what will be printed on application output
  * @return formated response of the query
  */
 QVariant SqlBuilder::rows(int outputMode, int debugMode) {
-    this->execute(debugMode);
-    QSqlQuery *query = DatabaseConnection::getInstance()->query;
+    QSqlQuery query = this->execute(debugMode);
 
     const int columnsCount = this->columns.size();
     int rowIndex, columnIndex;
@@ -162,10 +186,10 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
     QString column;
 
     // Iterate all rows on result
-    for (rowIndex = 0; query->next(); ++rowIndex) {
+    for (rowIndex = 0; query.next(); ++rowIndex) {
       for (columnIndex = 0; columnIndex < columnsCount; ++columnIndex) {
           column = this->columns[columnIndex];
-          value = query->value(columnIndex);
+          value = query.value(columnIndex);
           if (outputMode == RowOutput::Map) {
               rowMap.insert(column,value);
           } else if (outputMode == RowOutput::SingleList) {

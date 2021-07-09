@@ -16,34 +16,10 @@ DatabaseConnection::~DatabaseConnection()
 }
 
 /**
- * @brief DatabaseConnection::execute
- * @param sql
- * @param params
- * @return
- */
-bool DatabaseConnection::execute(QString sql, QVariantMap params,int* lastInsertId)
-{
-    openDatabase();
-    QSqlQuery *query = this->query;
-    query->prepare(sql);
-    foreach(auto param, params.keys()) {
-        query->bindValue(":" + param, params[param]);
-    }
-
-    bool result = query->exec();
-
-    if(lastInsertId!=nullptr)
-        *lastInsertId = query->lastInsertId().toInt();
-
-    return result;
-}
-
-/**
  * @brief Clear the querry attribute value and close database connection
  */
 void DatabaseConnection::closeConnection()
 {
-    this->query->clear();
     this->connection.close();
 }
 
@@ -63,18 +39,17 @@ DatabaseConnection* DatabaseConnection::getInstance()
 /**
  * @brief DatabaseConnection::openConnection
  */
-void DatabaseConnection::openConnection()
+void DatabaseConnection::initConnection()
 {
     this->connection = this->createConnection();
-    this->query = this->createQuery();
 }
 
 /**
  * @brief Create a pointer to a QSqlQuery created from current connection
  * @return The QSqlQuery pointer
  */
-QSqlQuery* DatabaseConnection::createQuery() {
-	return new QSqlQuery(this->connection);
+QSqlQuery DatabaseConnection::createQuery() {
+    return QSqlQuery(this->connection);
 }
 
 /**
@@ -89,8 +64,8 @@ QSqlDatabase DatabaseConnection::createConnection() {
     connection = QSqlDatabase::addDatabase(database_type);
     connection.setDatabaseName(database_path);
 
-    openDatabase();
-    connection.close();
+    openConnetion();
+    closeConnection();
 
     return connection;
 }
@@ -99,9 +74,9 @@ QSqlDatabase DatabaseConnection::createConnection() {
  * @brief Try open the database file
  * @return True if database was opened and throw exception if a error occur
  */
-bool DatabaseConnection::openDatabase()
+bool DatabaseConnection::openConnetion()
 {
-    if (!connection.open()) {
+    if (!this->connection.open()) {
       /**
        * Throws an exception if had some error on connection attempt.
        * @throws exception

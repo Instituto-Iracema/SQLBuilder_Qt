@@ -24,9 +24,9 @@ public:
     SqlBuilder* destroy();
     SqlBuilder* update(const QVariantMap mapColumnToValue);
     SqlBuilder* tableInfo();
-    SqlBuilder* executed(int outputMode=DebugMode::DebugErrors);
+    bool executed(int outputMode=DebugMode::DebugErrors);
 
-    bool execute(int debugMode=DebugMode::DebugErrors,int* lastInsertId = nullptr);
+    QSqlQuery execute(int debugMode=DebugMode::DebugErrors,int* lastInsertId = nullptr);
     QVariant rows(int outputMode=RowOutput::Map, int debugMode=DebugMode::DebugErrors);
 
     QStringList tableColumns();
