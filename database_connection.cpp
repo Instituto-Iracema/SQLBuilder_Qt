@@ -81,7 +81,7 @@ bool DatabaseConnection::openConnetion()
        * Throws an exception if had some error on connection attempt.
        * @throws exception
        */
-       throw std::runtime_error(QString("Error trying connect to database %1.").arg(database_path).toUtf8());
+//       throw std::runtime_error(QString("Error trying connect to database %1.").arg(database_path).toUtf8());
     }
     return  true;
 }
