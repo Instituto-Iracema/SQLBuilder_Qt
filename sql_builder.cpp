@@ -118,6 +118,12 @@ SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue) {
     return this;
 }
 
+SQLBuilder::SqlBuilder *SqlBuilder::join(QString query, QString join_type)
+{
+    this->sql += QString(" %1 JOIN ").arg(join_type) + query;
+
+    return this;
+}
 /**
  * @brief call the execute function
  * @param outputMode The format to output

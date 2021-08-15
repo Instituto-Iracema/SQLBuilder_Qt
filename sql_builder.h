@@ -24,6 +24,7 @@ public:
     SqlBuilder* insert(const QVariantMap mapColumnToValue);
     SqlBuilder* destroy();
     SqlBuilder* update(const QVariantMap mapColumnToValue);
+    SqlBuilder* join(QString query, QString join_type = "LEFT");
     SqlBuilder* tableInfo();
     bool executed(int outputMode=DebugMode::DebugErrors);
 
