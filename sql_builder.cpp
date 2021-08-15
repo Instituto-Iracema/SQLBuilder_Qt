@@ -17,10 +17,10 @@ SqlBuilder* SqlBuilder::select(QStringList columns) {
     this->sql += "SELECT " + columns.join(",") + " FROM " + this->table;
 
     foreach (QString column, columns) {
-        if (column != "*") {
-            this->columns.append(column);
-        } else {
+        if (column == "*" || column == QString("%1.*").arg(this->table)) {
             this->columns.append(this->tableColumns());
+        } else {
+            this->columns.append(column.split("as ").last());
         }
     }
 
