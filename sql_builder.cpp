@@ -124,6 +124,14 @@ SQLBuilder::SqlBuilder *SqlBuilder::join(QString query, QString join_type)
 
     return this;
 }
+
+SQLBuilder::SqlBuilder *SqlBuilder::group_by(QString column)
+{
+    this->sql += " GROUP BY " + column;
+
+    return this;
+}
+
 /**
  * @brief call the execute function
  * @param outputMode The format to output
