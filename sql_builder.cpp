@@ -53,6 +53,13 @@ SqlBuilder* SqlBuilder::where(QString column, QString sqlOperator, QVariantList 
     return this;
 }
 
+SQLBuilder::SqlBuilder *SqlBuilder::where(QString query)
+{
+    this->sql += " WHERE " + query;
+
+    return this;
+}
+
 /**
  * @brief insert on current sql the core of a delete sql query
  * @param mapColumnToValue

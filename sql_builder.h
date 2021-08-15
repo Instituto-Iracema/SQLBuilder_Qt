@@ -20,6 +20,7 @@ public:
     SqlBuilder(QString table);
     SqlBuilder* select(QStringList columns = {"*"});
     SqlBuilder* where(QString column, QString sqlOperator, QVariantList values);
+    SqlBuilder* where(QString query);
     SqlBuilder* insert(const QVariantMap mapColumnToValue);
     SqlBuilder* destroy();
     SqlBuilder* update(const QVariantMap mapColumnToValue);
