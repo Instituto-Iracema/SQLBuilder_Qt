@@ -1,0 +1,12 @@
+#ifndef QTSQLBUILDER_GLOBAL_H
+#define QTSQLBUILDER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(QTSQLBUILDER_LIBRARY)
+#  define QTSQLBUILDER_EXPORT Q_DECL_EXPORT
+#else
+#  define QTSQLBUILDER_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // QTSQLBUILDER_GLOBAL_H

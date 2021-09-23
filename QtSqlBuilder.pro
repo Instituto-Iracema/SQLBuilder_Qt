@@ -1,20 +1,24 @@
-TEMPLATE = lib
-
 QT -= gui
 QT += sql
+TEMPLATE = lib
+DEFINES += QTSQLBUILDER_LIBRARY
 
-CONFIG += c++17 console
-CONFIG -= app_bundle
-
+CONFIG += c++11
+CONFIG += staticlib
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+SOURCES += \
+    database_connection.cpp \
+    sql_builder.cpp
 
-HEADERS += $$PWD/*.h
-
-SOURCES += $$PWD/*.cpp
+HEADERS += \
+    QtSqlBuilder_global.h \
+    database_connection.h \
+    sql_builder.h
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
+unix {
+    target.path = /usr/lib
+}
 !isEmpty(target.path): INSTALLS += target

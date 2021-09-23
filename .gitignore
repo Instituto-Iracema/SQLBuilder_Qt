@@ -14,6 +14,9 @@
 *.so.*
 *.dll
 *.dylib
+*.obj
+*.pdb
+*.lib
 
 # Qt-es
 object_script.*.Release
