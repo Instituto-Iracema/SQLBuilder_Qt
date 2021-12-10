@@ -26,7 +26,6 @@ public:
     SqlBuilder* update(const QVariantMap mapColumnToValue);
     SqlBuilder* join(QString query, QString join_type = "LEFT");
     SqlBuilder* group_by(QString column);
-    SqlBuilder* tableInfo();
     bool executed(int outputMode=DebugMode::DebugErrors);
 
     QSqlQuery execute(int debugMode=DebugMode::DebugErrors,int* lastInsertId = nullptr);
@@ -42,13 +41,13 @@ public:
     enum DebugMode {
         DebugNothing,
         DebugErrors,
-        DebugAll,
+        DebugAll
     };
 
     enum RowOutput {
         Grid,
         SingleList,
-        Map,
+        Map
     };
 };
 }

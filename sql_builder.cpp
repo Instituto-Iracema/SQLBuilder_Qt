@@ -5,7 +5,7 @@ using SqlBuilder = SQLBuilder::SqlBuilder;
 
 SqlBuilder::SqlBuilder(QString table)
 {
-  this->table = table;
+    this->table = table;
 }
 
 /**
@@ -13,21 +13,23 @@ SqlBuilder::SqlBuilder(QString table)
  * @param columns
  * @return
  */
-SqlBuilder* SqlBuilder::select(QStringList columns) {
+SqlBuilder* SqlBuilder::select(QStringList columns)
+{
     this->sql += "SELECT " + columns.join(",") + " FROM " + this->table;
 
-    foreach (QString column, columns) {
-        if (column == "*" || column == QString("%1.*").arg(this->table)) {
+    foreach (QString column, columns)
+    {
+        if (column == "*" || column == QString("%1.*").arg(this->table))
             this->columns.append(this->tableColumns());
-        } else {
+        else
             this->columns.append(column.split("as ").last());
-        }
     }
 
     return this;
 }
 
-SqlBuilder* SqlBuilder::where(QString column, QString sqlOperator, QVariantList values) {
+SqlBuilder* SqlBuilder::where(QString column, QString sqlOperator, QVariantList values)
+{
     this->sql += QString(" WHERE %1 %2 ").arg(column, sqlOperator);
 
     if (sqlOperator.toUpper() == "BETWEEN")
@@ -35,15 +37,17 @@ SqlBuilder* SqlBuilder::where(QString column, QString sqlOperator, QVariantList 
     else if (sqlOperator.toUpper() == "IN")
         this->sql += "(";
 
-    for (int index = 0; index < values.length(); ++index) {
+    for (int index = 0; index < values.length(); ++index)
+    {
         // sets params["where_i"] to values[i]
-            this->params[QString("where_%1").arg(index)] = values[index];
+        this->params[QString("where_%1").arg(index)] = values[index];
         // constructs :where_0,:where_1,...,where_n
-        if (sqlOperator.toUpper() != "BETWEEN") {
+        if (sqlOperator.toUpper() != "BETWEEN")
+        {
             this->sql += QString(":where_%1").arg(index);
-            if (index != values.length() - 1) {
+            
+            if (index != values.length() - 1)
                 this->sql += ',';
-            }
         }
     }
 
@@ -65,7 +69,8 @@ SQLBuilder::SqlBuilder *SqlBuilder::where(QString query)
  * @param mapColumnToValue
  * @return This
  */
-SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue) {
+SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue)
+{
     this->sql += "INSERT INTO " + this->table;
     this->params = mapColumnToValue;
 
@@ -73,17 +78,19 @@ SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue) {
     const QStringList columnsList = mapColumnToValue.keys();
     const QString lastColumn = columnsList.last();
 
-    foreach (column, columnsList) {
+    foreach (column, columnsList)
+    {
         columnsStatement += column;
         placeholdersStatement += ':' + column;
-        if (column != lastColumn) {
+        if (column != lastColumn)
+        {
             columnsStatement += ',';
             placeholdersStatement += ',';
         }
     }
 
     this->sql += QString(" (%1) VALUES (%2)")
-            .arg(columnsStatement, placeholdersStatement);
+        .arg(columnsStatement, placeholdersStatement);
 
     return this;
 }
@@ -92,8 +99,10 @@ SqlBuilder* SqlBuilder::insert(QVariantMap mapColumnToValue) {
  * @brief insert on current sql the core of a delete sql query
  * @return This
  */
-SqlBuilder* SqlBuilder::destroy() {
+SqlBuilder* SqlBuilder::destroy()
+{
     this->sql += "DELETE FROM " + this->table;
+
     return this;
 }
 
@@ -102,15 +111,18 @@ SqlBuilder* SqlBuilder::destroy() {
  * @param values
  * @return
  */
-SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue) {
+SqlBuilder* SqlBuilder::update(const QVariantMap mapColumnToValue)
+{
     this->sql += "UPDATE " + this->table + " SET ";
     this->params = mapColumnToValue;
 
     QString column;
     const QStringList columns = mapColumnToValue.keys();
 
-    foreach (column, columns) {
+    foreach (column, columns)
+    {
         this->sql += column + "=" + ":" + column;
+        
         if (column != columns.last())
             this->sql += ',';
     }
@@ -137,11 +149,13 @@ SQLBuilder::SqlBuilder *SqlBuilder::group_by(QString column)
  * @param outputMode The format to output
  * @return This
  */
-bool SqlBuilder::executed(int outputMode) {
+bool SqlBuilder::executed(int outputMode)
+{
     DatabaseConnection::getInstance()->openConnetion();
     QSqlQuery query = DatabaseConnection::getInstance()->createQuery();
     query.prepare(sql);
-    foreach(auto param, params.keys()) {
+    foreach(auto param, params.keys())
+    {
         query.bindValue(":" + param, params[param]);
     }
 
@@ -149,7 +163,8 @@ bool SqlBuilder::executed(int outputMode) {
 
     const QSqlError queryLastError = query.lastError();
 
-    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid())) {
+    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid()))
+    {
         qDebug() << "SqlError:" << queryLastError.text();
         qDebug() << "Sql statement:" << this->sql;
         qDebug() << "Params:" << this->params;
@@ -165,11 +180,14 @@ bool SqlBuilder::executed(int outputMode) {
  * @param lastInsertId A pointer to last inserted row id on database
  * @return True if the query was executed and false if it fail
  */
-QSqlQuery SqlBuilder::execute(int outputMode,int* lastInsertId) {
+QSqlQuery SqlBuilder::execute(int outputMode,int* lastInsertId)
+{
     DatabaseConnection::getInstance()->openConnetion();
     QSqlQuery query = DatabaseConnection::getInstance()->createQuery();
     query.prepare(sql);
-    foreach(auto param, params.keys()) {
+
+    foreach(auto param, params.keys())
+    {
         query.bindValue(":" + param, params[param]);
     }
 
@@ -180,7 +198,8 @@ QSqlQuery SqlBuilder::execute(int outputMode,int* lastInsertId) {
 
     const QSqlError queryLastError = query.lastError();
 
-    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid())) {
+    if ((outputMode == DebugMode::DebugAll) ||(outputMode == DebugMode::DebugErrors && queryLastError.isValid()))
+    {
         qDebug() << "SqlError:" << queryLastError.text();
         qDebug() << "Sql statement:" << this->sql;
         qDebug() << "Params:" << this->params;
@@ -196,7 +215,8 @@ QSqlQuery SqlBuilder::execute(int outputMode,int* lastInsertId) {
  * @param debugMode Define what will be printed on application output
  * @return formated response of the query
  */
-QVariant SqlBuilder::rows(int outputMode, int debugMode) {
+QVariant SqlBuilder::rows(int outputMode, int debugMode)
+{
     QSqlQuery query = this->execute(debugMode);
 
     const int columnsCount = this->columns.size();
@@ -207,25 +227,30 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
     QString column;
 
     // Iterate all rows on result
-    for (rowIndex = 0; query.next(); ++rowIndex) {
-      for (columnIndex = 0; columnIndex < columnsCount; ++columnIndex) {
-          column = this->columns[columnIndex];
-          value = query.value(columnIndex);
-          if (outputMode == RowOutput::Map) {
-              rowMap.insert(column,value);
-          } else if (outputMode == RowOutput::SingleList) {
-              resultRows.append(value);
-          } else if (outputMode == RowOutput::Grid) {
-              row.append(value);
-          }
-      }
-      if (outputMode == RowOutput::Grid) {
-          resultRows.append(QVariant(row));
-          row = {};
-      } else if(outputMode == RowOutput::Map) {
-          resultMap.append(rowMap);
-          rowMap = {};
-      }
+    for (rowIndex = 0; query.next(); ++rowIndex)
+    {
+        for (columnIndex = 0; columnIndex < columnsCount; ++columnIndex)
+        {
+            column = this->columns[columnIndex];
+            value = query.value(columnIndex);
+
+            if (outputMode == RowOutput::Map)
+                rowMap.insert(column,value);
+            else if (outputMode == RowOutput::SingleList)
+                resultRows.append(value);
+            else if (outputMode == RowOutput::Grid)
+                row.append(value);
+        }
+        if (outputMode == RowOutput::Grid)
+        {
+            resultRows.append(QVariant(row));
+            row = {};
+        }
+        else if(outputMode == RowOutput::Map)
+        {
+            resultMap.append(rowMap);
+            rowMap = {};
+        }
     }
 
     DatabaseConnection::getInstance()->closeConnection();
@@ -242,42 +267,44 @@ QVariant SqlBuilder::rows(int outputMode, int debugMode) {
  * @brief SqlBuilder::tableColumns
  * @return
  */
-QStringList SqlBuilder::tableColumns() {
-    return this->tableInfo()
-            ->select({"name"})
-            ->rows(RowOutput::SingleList).toStringList();
-}
-
-/**
- * @brief SqlBuilder::tableInfo
- * @return
- */
-SqlBuilder* SqlBuilder::tableInfo() {
-    const QString tableName = QString("PRAGMA_TABLE_INFO('%1')").arg(this->table);
-    return new SqlBuilder(tableName);
+QStringList SqlBuilder::tableColumns()
+{
+    return SqlBuilder(QString("PRAGMA_TABLE_INFO('%1')").arg(this->table))
+        .select({"name"})
+        ->rows(RowOutput::SingleList).toStringList();
 }
 
 /**
  * @brief set a new value to sql query
  * @param The new sql query
  */
-void SqlBuilder::setSql(QString sql) { this->sql = sql; }
+void SqlBuilder::setSql(QString sql)
+{
+    this->sql = sql;
+}
 
 /**
  * @brief get the current sql quary
  * @return The sql query
  */
-QString SqlBuilder::getSql() { return this->sql; }
+QString SqlBuilder::getSql()
+{
+    return this->sql;
+}
 
 /**
  * @brief define the sql query to empty string
  */
-void SqlBuilder::cleanSql() {
-   this->sql = "";
+void SqlBuilder::cleanSql()
+{
+    this->sql = "";
 }
 
 /**
  * @brief return table name
  * @return The table name
  */
-QString SQLBuilder::SqlBuilder::getTableName(){ return this->table; }
+QString SQLBuilder::SqlBuilder::getTableName()
+{
+    return this->table;
+}

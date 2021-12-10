@@ -5,48 +5,48 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    // return a.exec();
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
 
-    /**
-     * Select example.
-     */
-    // queryBuilder("users")
-    //   ->select({"id", "name", "registration"})
-    //   ->where({"id", "=", {1})
-    //   ->rows();
+    /*
+    * Select example.
+    */
+    SQLBuilder::SqlBuilder("users")
+        .select({"id", "name", "registration"})
+        ->where("id", "=", {1})
+        ->rows();
 
-    /**
-     * Insert example.
-     */
-    // QVariantMap values =  {
-    //     {"name", "Chaves"},
-    //     {"registration", "123456"},
-    // };
+    /*
+    * Insert example.
+    */
+    QVariantMap values =  {
+        {"name", "Chaves"},
+        {"registration", "123456"},
+    };
 
-    // queryBuilder("users")
-    //         ->insert(values)
-    //         ->execute();
+    SQLBuilder::SqlBuilder("users")
+        .insert(values)
+        ->execute();
 
-    /**
-     * Delete example.
-     */
-    // queryBuilder("users")
-    // ->destroy()
-    // ->where("id", "=", {14})
-    // ->execute();
+    /*
+    * Delete example.
+    */
+    SQLBuilder::SqlBuilder("users")
+        .destroy()
+        ->where("id", "=", {14})
+        ->execute();
 
-    /**
-     * Update example.
-     */
+    /*
+    * Update example.
+    */
+    QVariantMap values2;
 
-   // QVariantMap values;
+    values["name"] = "Ñoño";
+    values["registration"] = "654321";
 
-   // values["name"] = "Ñoño";
-   // values["registration"] = "654321";
-
-   // queryBuilder("users")
-   // ->update(values)->where({"id", "=", "4"})->execute();
+    SQLBuilder::SqlBuilder("users")
+        .update(values2)
+        ->where("id", "=", {"4"})->execute();
 
     return 0;
 }
